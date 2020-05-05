@@ -2,13 +2,16 @@ package br.com.alura.curso.springboot.forum.DTO;
 
 import br.com.alura.curso.springboot.forum.model.Resposta;
 
-public class RespostaDTO {
+import java.io.Serializable;
+
+public class RespostaDTO implements Serializable {
 
     private Long id;
     private String mensagem;
     private String topico;
     private Boolean resolvido;
 
+    public RespostaDTO(){}
 
     public RespostaDTO(Resposta respostaSalva) {
             this.id = respostaSalva.getId();

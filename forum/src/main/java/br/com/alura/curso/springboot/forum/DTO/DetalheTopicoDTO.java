@@ -3,12 +3,13 @@ package br.com.alura.curso.springboot.forum.DTO;
 import br.com.alura.curso.springboot.forum.model.StatusTopico;
 import br.com.alura.curso.springboot.forum.model.Topico;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DetalheTopicoDTO {
+public class DetalheTopicoDTO implements Serializable {
 
     private Long id;
     private String titulo;
@@ -19,6 +20,8 @@ public class DetalheTopicoDTO {
 
     private List<RespostaDetalheDTO> respostasDTO ;
 
+    public DetalheTopicoDTO(){}
+
     public DetalheTopicoDTO(Topico topico) {
         this.id = topico.getId();
         this.titulo = topico.getTitulo();
@@ -28,10 +31,6 @@ public class DetalheTopicoDTO {
         this.respostasDTO = new ArrayList<>();
         this.respostasDTO = topico.getRespostas().stream().map(RespostaDetalheDTO::new).collect(Collectors.toList());
         this.status = topico.getStatus();
-
-    }
-
-    public DetalheTopicoDTO() {
 
     }
 

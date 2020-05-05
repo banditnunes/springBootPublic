@@ -4,6 +4,7 @@ public class TokenDTO {
     private final String tipo;
     private final String token;
 
+
     public TokenDTO(String token, String tipo) {
         this.token = token;
         this.tipo = tipo;

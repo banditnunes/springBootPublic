@@ -2,7 +2,9 @@ package br.com.alura.curso.springboot.forum.DTO;
 
 import br.com.alura.curso.springboot.forum.model.Categoria;
 
-public class CategoriaDTO extends BaseDTO{
+import java.io.Serializable;
+
+public class CategoriaDTO extends BaseDTO implements Serializable {
 
     private String descricao;
 

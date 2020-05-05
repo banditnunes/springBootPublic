@@ -2,13 +2,16 @@ package br.com.alura.curso.springboot.forum.DTO;
 
 import br.com.alura.curso.springboot.forum.model.Resposta;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class RespostaDetalheDTO {
+public class RespostaDetalheDTO implements Serializable {
 
-    private final String mensagem;
-    private final String autor;
-    private final LocalDateTime dataCriacao;
+    private  String mensagem;
+    private String autor;
+    private  LocalDateTime dataCriacao;
+
+    public RespostaDetalheDTO(){}
 
     public RespostaDetalheDTO(Resposta resposta) {
         this.mensagem = resposta.getMensagem();

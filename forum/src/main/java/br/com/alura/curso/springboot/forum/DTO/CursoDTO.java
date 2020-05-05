@@ -9,10 +9,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class CursoDTO extends BaseDTO{
+public class CursoDTO extends BaseDTO implements Serializable {
 
     private Long id;
     private String nome;
@@ -59,9 +60,7 @@ public class CursoDTO extends BaseDTO{
             curso.get().setNome(getNome());
 
             Optional<Categoria> categoriaRetornada = categoriaRepository.findByDescricao(getCategoria()).stream().findFirst();
-            if (categoriaRetornada.isPresent()) {
-                curso.get().setCategoria(categoriaRetornada.get());
-            }
+            categoriaRetornada.ifPresent(value -> curso.get().setCategoria(value));
 
             setId(curso.get().getId());
             return ResponseEntity.ok(this);

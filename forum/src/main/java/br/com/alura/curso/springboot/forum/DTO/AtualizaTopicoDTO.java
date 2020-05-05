@@ -5,13 +5,16 @@ import br.com.alura.curso.springboot.forum.repository.TopicoRepository;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
-public class AtualizaTopicoDTO {
+public class AtualizaTopicoDTO implements Serializable {
     @NotNull
     @Length(min = 2,max = 120)
     private String titulo;
     @NotNull @Length(min = 2,max = 1200)
     private String mensagem;
+
+    public AtualizaTopicoDTO(){}
 
     public void atualizarTopico(Long id, TopicoRepository repository){
         Topico topico = repository.getOne(id);
