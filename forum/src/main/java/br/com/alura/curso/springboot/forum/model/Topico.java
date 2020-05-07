@@ -1,12 +1,13 @@
 package br.com.alura.curso.springboot.forum.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "topico")
-public class Topico {
+public class Topico implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

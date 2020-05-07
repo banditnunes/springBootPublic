@@ -1,6 +1,8 @@
 package br.com.alura.curso.springboot.forum.DTO;
 
-public class TokenDTO {
+import java.io.Serializable;
+
+public class TokenDTO implements Serializable {
     private final String tipo;
     private final String token;
 

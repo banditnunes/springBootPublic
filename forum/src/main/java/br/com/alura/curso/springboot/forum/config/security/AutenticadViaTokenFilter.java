@@ -54,7 +54,11 @@ public class AutenticadViaTokenFilter extends OncePerRequestFilter {
 
     }
 
-    public static Usuario retornaUsuarioLogado(){
+    public static Usuario retornaUsuarioLogado(String token){
+
+
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        System.out.println(SecurityContextHolder.getContext().getAuthentication());
         return (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

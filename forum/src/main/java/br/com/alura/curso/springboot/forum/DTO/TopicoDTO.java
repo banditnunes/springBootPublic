@@ -24,9 +24,7 @@ public class TopicoDTO implements Serializable {
     }
     public TopicoDTO(){}
 
-    public static Page<TopicoDTO> transformaTopicoDTO(Page<Topico> topicos){
-        return topicos.map(TopicoDTO::new);
-    }
+    public static Page<TopicoDTO> transformaTopicoDTO(Page<Topico> topicos){ return topicos.map(TopicoDTO::new); }
 
     public Long getId() {
         return id;

@@ -1,15 +1,22 @@
 package br.com.alura.curso.springboot.forum.DTO;
 
 import br.com.alura.curso.springboot.forum.model.Resposta;
+import br.com.alura.curso.springboot.forum.model.Topico;
+import br.com.alura.curso.springboot.forum.repository.RespostaRepository;
+import br.com.alura.curso.springboot.forum.repository.TopicoRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class RespostaDTO implements Serializable {
 
     private Long id;
     private String mensagem;
     private String topico;
-    private Boolean resolvido;
+    private boolean resolvido;
 
     public RespostaDTO(){}
 
@@ -44,11 +51,30 @@ public class RespostaDTO implements Serializable {
         this.topico = topico;
     }
 
-    public Boolean getResolvido() {
+    public boolean isResolvido() {
         return resolvido;
     }
 
-    public void setResolvido(Boolean resolvido) {
+    public void setResolvido(boolean resolvido) {
         this.resolvido = resolvido;
+    }
+
+    public Resposta converter(RespostaRepository respostaRepository, Long id, TopicoRepository topicoRepository) {
+        Resposta resposta = respostaRepository.findById(id).get();
+
+        resposta.setMensagem(getMensagem());
+        Optional<Topico> topicoRetornado = topicoRepository.findByTitulo(getTopico()).stream().findFirst();
+
+        if(topicoRetornado.isPresent()){
+            resposta.setTopico(topicoRetornado.get());
+        }else{
+            throw new EntityNotFoundException();
+        }
+        System.out.println(isResolvido());
+        if(isResolvido()) {
+            resposta.setSolucao(isResolvido());
+        }
+        System.out.println(resposta.getId()+" - "+resposta.getAutor().getNome()+" - "+resposta.getMensagem()+" - "+resposta.getSolucao());
+        return resposta;
     }
 }

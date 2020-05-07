@@ -1,6 +1,8 @@
 package br.com.alura.curso.springboot.forum.controller;
 
 import br.com.alura.curso.springboot.forum.DTO.DetalheTopicoDTO;
+import br.com.alura.curso.springboot.forum.DTO.RespostaDTO;
+import br.com.alura.curso.springboot.forum.form.RespostaForm;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +20,7 @@ public abstract class BaseController<T , Long,TForm,TDTO>{
 
     @PostMapping
     @Transactional
-    public abstract ResponseEntity<TDTO> cadastrar(@RequestBody @Valid TForm tForm,UriComponentsBuilder uriComponentsBuilder);
+    public abstract ResponseEntity<TDTO> cadastrar(String header,@RequestBody @Valid TForm tForm,UriComponentsBuilder uriComponentsBuilder);
 
     @GetMapping
     public abstract Page<TDTO> listar(@RequestParam(required = false) String campo, Pageable page);

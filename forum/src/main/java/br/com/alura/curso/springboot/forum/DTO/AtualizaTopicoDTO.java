@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 public class AtualizaTopicoDTO implements Serializable {
+
+    private Long id;
     @NotNull
     @Length(min = 2,max = 120)
     private String titulo;
@@ -20,6 +22,7 @@ public class AtualizaTopicoDTO implements Serializable {
         Topico topico = repository.getOne(id);
         topico.setTitulo(this.titulo);
         topico.setMensagem(this.mensagem);
+        topico.setId(this.id);
 
     }
 
@@ -37,5 +40,13 @@ public class AtualizaTopicoDTO implements Serializable {
 
     public void setMensagem(String mensagem) {
         this.mensagem = mensagem;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

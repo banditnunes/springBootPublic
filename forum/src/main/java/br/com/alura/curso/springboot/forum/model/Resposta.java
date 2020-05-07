@@ -15,7 +15,7 @@ public class Resposta {
 	private LocalDateTime dataCriacao = LocalDateTime.now();
 	@ManyToOne
 	private Usuario autor;
-	private Boolean solucao = false;
+	private Boolean solucao;
 
 	public Resposta(String mensagem, Topico topico, Usuario autor, boolean solucao) {
 		this.mensagem=mensagem;
@@ -43,11 +43,8 @@ public class Resposta {
 			return false;
 		Resposta other = (Resposta) obj;
 		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+			return other.id == null;
+		} else return id.equals(other.id);
 	}
 
 	public Long getId() {
