@@ -1,22 +1,20 @@
 package br.com.alura.curso.springboot.forum.form;
 
-import br.com.alura.curso.springboot.forum.config.security.AutenticadViaTokenFilter;
 import br.com.alura.curso.springboot.forum.model.Resposta;
 import br.com.alura.curso.springboot.forum.model.Topico;
 import br.com.alura.curso.springboot.forum.model.Usuario;
 import br.com.alura.curso.springboot.forum.repository.TopicoRepository;
 import br.com.alura.curso.springboot.forum.repository.UsuarioRepository;
 import br.com.alura.curso.springboot.forum.service.TokenService;
-import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import org.hibernate.procedure.NoSuchParameterException;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.awt.print.Pageable;
 import java.util.Optional;
 
 public class RespostaForm {
 
+    private static final Logger logger = LoggerFactory.getLogger(RespostaForm.class);
     private String mensagem;
     private String topico;
 
@@ -28,26 +26,24 @@ public class RespostaForm {
         return topico;
     }
 
-    public Resposta converter(TopicoRepository topicoRepository,TokenService tokenService,String token,UsuarioRepository usuarioRepository) {
-        System.out.println("Buscando usuario logado");
-        System.out.println("Topico:"+topico);
-        Usuario autor = retornaUsuarioLogado(token,tokenService,usuarioRepository);
-        System.out.println("Usuario:"+autor.getNome());
+    public Resposta converter(TopicoRepository topicoRepository, TokenService tokenService, String token, UsuarioRepository usuarioRepository) {
+        logger.info("Buscando usuario logado");
+        Usuario autor = retornaUsuarioLogado(token, tokenService, usuarioRepository);
+        logger.debug("Usuario:" + autor.getNome());
         Optional<Topico> topicoOptional = topicoRepository.findByTitulo(topico).stream().findFirst();
-        System.out.println(topicoOptional.isPresent());
-        if(topicoOptional.isPresent()){
+        if (topicoOptional.isPresent()) {
+            logger.debug("Tópico " + topico + " retornado");
             Topico topico = topicoOptional.get();
-            return new Resposta(mensagem,topico,autor,false);
-        }else {
+            return new Resposta(mensagem, topico, autor, false);
+        } else {
+            logger.error("Tópico " + topico + " não relacionado a resposta");
             throw new NoSuchParameterException("A Resposta não está associada a um Tópico existente");
         }
     }
 
 
-
-    private Usuario retornaUsuarioLogado(String token, TokenService tokenService, UsuarioRepository usuarioRepository){
+    private Usuario retornaUsuarioLogado(String token, TokenService tokenService, UsuarioRepository usuarioRepository) {
         Long idUsuario = tokenService.getIdUsuario(token);
-        System.out.println(idUsuario);
         return usuarioRepository.findById(idUsuario).get();
     }
 }

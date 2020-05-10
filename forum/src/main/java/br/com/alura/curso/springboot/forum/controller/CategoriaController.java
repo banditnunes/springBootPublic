@@ -73,7 +73,7 @@ public class CategoriaController extends BaseController<Categoria,Long, Categori
     public ResponseEntity remover(@PathVariable Long id) {
         try {
              categoriaRepository.deleteById(id);
-            logger.debug("Categoria com id  "+id+ " removida com sucesso");
+                logger.debug("Categoria com id  "+id+ " removida com sucesso");
              return ResponseEntity.ok().build();
         }catch (Exception e) {
             logger.debug("Categoria com id "+id+" não encpntrada");

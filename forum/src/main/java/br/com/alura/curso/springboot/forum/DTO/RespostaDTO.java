@@ -4,15 +4,16 @@ import br.com.alura.curso.springboot.forum.model.Resposta;
 import br.com.alura.curso.springboot.forum.model.Topico;
 import br.com.alura.curso.springboot.forum.repository.RespostaRepository;
 import br.com.alura.curso.springboot.forum.repository.TopicoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class RespostaDTO implements Serializable {
 
+    private static final Logger logger = LoggerFactory.getLogger(RespostaDTO.class);
     private Long id;
     private String mensagem;
     private String topico;
@@ -61,20 +62,20 @@ public class RespostaDTO implements Serializable {
 
     public Resposta converter(RespostaRepository respostaRepository, Long id, TopicoRepository topicoRepository) {
         Resposta resposta = respostaRepository.findById(id).get();
-
+        logger.debug("Resposta de id "+id+" foi retornada" );
         resposta.setMensagem(getMensagem());
         Optional<Topico> topicoRetornado = topicoRepository.findByTitulo(getTopico()).stream().findFirst();
 
         if(topicoRetornado.isPresent()){
+            logger.debug("Topico "+getTopico()+" retornado");
             resposta.setTopico(topicoRetornado.get());
         }else{
+            logger.error("Topico "+getTopico()+" não encontrado");
             throw new EntityNotFoundException();
         }
-        System.out.println(isResolvido());
         if(isResolvido()) {
             resposta.setSolucao(isResolvido());
         }
-        System.out.println(resposta.getId()+" - "+resposta.getAutor().getNome()+" - "+resposta.getMensagem()+" - "+resposta.getSolucao());
         return resposta;
     }
 }

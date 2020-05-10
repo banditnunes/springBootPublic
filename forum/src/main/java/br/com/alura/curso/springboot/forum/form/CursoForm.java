@@ -4,12 +4,20 @@ import br.com.alura.curso.springboot.forum.model.Categoria;
 import br.com.alura.curso.springboot.forum.model.Curso;
 import br.com.alura.curso.springboot.forum.repository.CategoriaRepository;
 import br.com.alura.curso.springboot.forum.repository.CursoRepository;
+import javassist.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
+
 public class CursoForm extends BaseForm<Curso, CursoRepository>{
+
+    private static final Logger logger = LoggerFactory.getLogger(CursoForm.class);
     private String descricao;
     private String categoria;
+
 
 
     public String getDescricao() {
@@ -29,15 +37,14 @@ public class CursoForm extends BaseForm<Curso, CursoRepository>{
     }
 
 
-    public Curso converter(CategoriaRepository categoriaRepository) {
-        System.out.println(this.categoria);
+    public Curso converter(CategoriaRepository categoriaRepository){
         Optional<Categoria> categoriaOptional = categoriaRepository.findByDescricao(this.categoria).stream().findFirst();
         if(categoriaOptional.isPresent()){
-            System.out.println(categoriaOptional.get().getId());
+            logger.debug("Categoria "+categoriaOptional.get().getId()+" retornada");
             Categoria categoria = categoriaOptional.get();
             return new Curso(this.descricao,categoria);
         }
-            //Deveria retornar erro informando sobre a Categoria não existente
-         return null;
+            logger.error("Categoria "+ this.categoria + "não foi encontrada");
+        throw new EntityNotFoundException();
     }
 }
