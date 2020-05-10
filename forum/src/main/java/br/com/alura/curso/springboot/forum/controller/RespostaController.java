@@ -12,6 +12,9 @@ import br.com.alura.curso.springboot.forum.util.RecuperaToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,9 @@ import java.util.Optional;
 @RequestMapping("resposta")
 public class RespostaController  extends  BaseController<Resposta,Long, RespostaForm, RespostaDTO>{
     private static final Logger logger = LoggerFactory.getLogger(RespostaController.class);
+    private static final String CACHE_NOME_RESPOSTA = "Resposta";
+    private static final String CACHE_KEY_RESPOSTA = "#id";
+
 
     @Autowired
     RespostaRepository respostaRepository;
@@ -44,6 +50,7 @@ public class RespostaController  extends  BaseController<Resposta,Long, Resposta
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_NOME_RESPOSTA,key = CACHE_KEY_RESPOSTA)
     public ResponseEntity<RespostaDTO> cadastrar(@RequestHeader(name = "Authorization") String token, @RequestBody  @Valid RespostaForm respostaForm, UriComponentsBuilder uriComponentsBuilder) {
         try {
             logger.info("Conversão inicializada...");
@@ -60,6 +67,7 @@ public class RespostaController  extends  BaseController<Resposta,Long, Resposta
 
 
     @Override
+    @Cacheable(cacheNames = CACHE_NOME_RESPOSTA,key = "#root.method.name")
     public Page<RespostaDTO> listar(@PathVariable String topico, Pageable page) {
         Topico topicoRetornado = topicoRetornado(topico);
         Page<Resposta> respostasPorTopico = respostaRepository.findByTopico(topicoRetornado, page);
@@ -69,6 +77,7 @@ public class RespostaController  extends  BaseController<Resposta,Long, Resposta
 
     @Override
     @Transactional
+    @Cacheable(cacheNames = CACHE_NOME_RESPOSTA,key = CACHE_KEY_RESPOSTA)
     public ResponseEntity<RespostaDTO> detalhar(@PathVariable Long id) {
         Optional<Resposta> respostaRetornada = respostaRepository.findById(id);
         if(respostaRetornada.isPresent()){
@@ -81,6 +90,7 @@ public class RespostaController  extends  BaseController<Resposta,Long, Resposta
 
     @Override
     @Transactional
+    @CachePut(cacheNames = CACHE_NOME_RESPOSTA,key = CACHE_KEY_RESPOSTA)
     public ResponseEntity<RespostaDTO> atualizar(@PathVariable Long id,@RequestBody RespostaDTO respostaDTO) {
         try {
             Resposta resposta = respostaDTO.converter(respostaRepository, id, topicoRepository);
@@ -94,6 +104,7 @@ public class RespostaController  extends  BaseController<Resposta,Long, Resposta
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_NOME_RESPOSTA,key = CACHE_KEY_RESPOSTA)
     public ResponseEntity remover(@PathVariable  Long id) {
         try {
             respostaRepository.deleteById(id);

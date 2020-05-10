@@ -8,6 +8,9 @@ import br.com.alura.curso.springboot.forum.repository.CursoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,8 @@ import java.util.Optional;
 public class CursoController extends BaseController<Curso, Long, CursoForm, CursoDTO> {
 
     private static final Logger logger = LoggerFactory.getLogger(CursoController.class);
+    private static final String CACHE_NOME_CURSO = "Curso";
+    private static final String CACHE_KEY_CURSO = "#id";
 
     @Autowired
     CursoRepository cursoRepository;
@@ -33,6 +38,7 @@ public class CursoController extends BaseController<Curso, Long, CursoForm, Curs
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_NOME_CURSO,allEntries = true)
     public ResponseEntity<CursoDTO> cadastrar(@RequestHeader String header,@RequestBody @Valid CursoForm cursoForm, UriComponentsBuilder uriComponentsBuilder) {
         Curso curso = cursoForm.converter(categoriaRepository);
         logger.debug(CursoForm.class.getName()+" foi convertido com para Curso ");
@@ -47,6 +53,7 @@ public class CursoController extends BaseController<Curso, Long, CursoForm, Curs
     }
 
     @Override
+    @Cacheable(cacheNames = CACHE_NOME_CURSO,key = "#root.method.name")
     public Page<CursoDTO> listar(String campo, Pageable page) {
         Page cursos;
         if (campo == null || campo.isEmpty()) {
@@ -58,6 +65,7 @@ public class CursoController extends BaseController<Curso, Long, CursoForm, Curs
     }
 
     @Override
+    @Cacheable(cacheNames = CACHE_NOME_CURSO,key = CACHE_KEY_CURSO)
     public ResponseEntity<CursoDTO> detalhar(@PathVariable  Long id) {
         Optional<Curso> curso = cursoRepository.findById(id);
         if (curso.isPresent()) {
@@ -70,6 +78,7 @@ public class CursoController extends BaseController<Curso, Long, CursoForm, Curs
 
     @Override
     @Transactional
+    @CachePut(cacheNames = CACHE_NOME_CURSO,key = CACHE_KEY_CURSO)
     public ResponseEntity<CursoDTO> atualizar(@PathVariable  Long id,@RequestBody @Valid CursoDTO cursoDTO) {
         return cursoDTO.atualizarCurso(cursoRepository, id, categoriaRepository);
     }
@@ -77,6 +86,7 @@ public class CursoController extends BaseController<Curso, Long, CursoForm, Curs
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_NOME_CURSO,key = CACHE_KEY_CURSO)
     public ResponseEntity remover(@PathVariable  Long id) {
         if (cursoRepository.findById(id).isPresent()) {
             cursoRepository.deleteById(id);

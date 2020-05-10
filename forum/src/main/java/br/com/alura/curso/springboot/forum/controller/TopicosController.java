@@ -42,9 +42,23 @@ public class TopicosController {
     UsuarioRepository usuarioRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(TopicosController.class);
+    private static final String CACHE_NOME_TOPICO = "Topico";
+    private static final String CACHE_KEY_TOPICO = "#id";
 
+
+    @PostMapping
+    @Transactional
+    @CacheEvict(cacheNames = CACHE_NOME_TOPICO,allEntries = true)
+    public ResponseEntity<TopicoDTO> cadastrar(@RequestHeader("Authorization") String token,@RequestBody @Valid TopicoForm topicoForm, UriComponentsBuilder uriComponentsBuilder){
+        Topico topico =topicoForm.converter(cursoRepository,token,tokenService,usuarioRepository);
+        logger.debug("TopicoForm foi convertido com para Topico ");
+        topicoRepository.save(topico);
+        logger.debug("Topico "+topico.getTitulo()+" salvo em Banco");
+        URI uri = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
+        return ResponseEntity.created(uri).body(new TopicoDTO(topico));
+    }
     @GetMapping
-    @Cacheable(cacheNames = "Topico",key = "#root.method.name")
+    @Cacheable(cacheNames = CACHE_NOME_TOPICO,key = "#root.method.name")
     public Page<TopicoDTO> listarTopicosPorCurso(@RequestParam(required = false) String nomeCurso,
                                                  @PageableDefault(page=0,size = 10,direction = Sort.Direction.ASC)
                                                          Pageable page){
@@ -55,20 +69,9 @@ public class TopicosController {
         }
 
     }
-    @PostMapping
-    @Transactional
-    @CacheEvict(cacheNames = "Topico",allEntries = true)
-    public ResponseEntity<TopicoDTO> cadastrar(@RequestHeader("Authorization") String token,@RequestBody @Valid TopicoForm topicoForm, UriComponentsBuilder uriComponentsBuilder){
-        Topico topico =topicoForm.converter(cursoRepository,token,tokenService,usuarioRepository);
-        logger.debug("TopicoForm foi convertido com para Topico ");
-        topicoRepository.save(topico);
-        logger.debug("Topico "+topico.getTitulo()+" salvo em Banco");
-        URI uri = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
-        return ResponseEntity.created(uri).body(new TopicoDTO(topico));
-    }
 
     @GetMapping("{id}")
-    @Cacheable(cacheNames = "Topico",key = "#id")
+    @Cacheable(cacheNames = CACHE_NOME_TOPICO,key = CACHE_KEY_TOPICO)
     public ResponseEntity<DetalheTopicoDTO> detalhar(@PathVariable Long id){
         Optional<Topico> topico = topicoRepository.findById(id);
         if(topico.isPresent()){
@@ -81,7 +84,7 @@ public class TopicosController {
 
     @PutMapping("{id}")
     @Transactional
-    @CachePut(cacheNames ="Topico",key = "#id")
+    @CachePut(cacheNames =CACHE_NOME_TOPICO,key = CACHE_KEY_TOPICO)
     public ResponseEntity<AtualizaTopicoDTO> atualizar(@PathVariable Long id,@RequestBody AtualizaTopicoDTO atualizaTopicoDTO){
         Optional<Topico> topico = topicoRepository.findById(id);
         if(topico.isPresent()) {
@@ -96,7 +99,7 @@ public class TopicosController {
 
     @DeleteMapping("{id}")
     @Transactional
-    @CacheEvict(cacheNames = "Topico",key = "#id")
+    @CacheEvict(cacheNames = CACHE_NOME_TOPICO,key =CACHE_KEY_TOPICO)
     public ResponseEntity<DetalheTopicoDTO> remover(@PathVariable Long id){
         Optional<Topico> topico = topicoRepository.findById(id);
         if(topico.isPresent()) {
