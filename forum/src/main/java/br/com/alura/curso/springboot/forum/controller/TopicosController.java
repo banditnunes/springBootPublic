@@ -7,6 +7,8 @@ import br.com.alura.curso.springboot.forum.form.TopicoForm;
 import br.com.alura.curso.springboot.forum.model.Topico;
 import br.com.alura.curso.springboot.forum.repository.CursoRepository;
 import br.com.alura.curso.springboot.forum.repository.TopicoRepository;
+import br.com.alura.curso.springboot.forum.repository.UsuarioRepository;
+import br.com.alura.curso.springboot.forum.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,11 @@ public class TopicosController {
     TopicoRepository topicoRepository;
     @Autowired
     CursoRepository cursoRepository;
+    @Autowired
+    TokenService tokenService;
+    @Autowired
+    UsuarioRepository usuarioRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(TopicosController.class);
 
     @GetMapping
@@ -52,7 +59,7 @@ public class TopicosController {
     @Transactional
     @CacheEvict(cacheNames = "Topico",allEntries = true)
     public ResponseEntity<TopicoDTO> cadastrar(@RequestHeader("Authorization") String token,@RequestBody @Valid TopicoForm topicoForm, UriComponentsBuilder uriComponentsBuilder){
-        Topico topico =topicoForm.converter(cursoRepository);
+        Topico topico =topicoForm.converter(cursoRepository,token,tokenService,usuarioRepository);
         logger.debug("TopicoForm foi convertido com para Topico ");
         topicoRepository.save(topico);
         logger.debug("Topico "+topico.getTitulo()+" salvo em Banco");

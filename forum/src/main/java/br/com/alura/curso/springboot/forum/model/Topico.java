@@ -26,10 +26,11 @@ public class Topico implements Serializable {
 	public Topico() {
 	}
 
-	public Topico(String titulo, String mensagem, Curso curso) {
+	public Topico(String titulo, String mensagem, Curso curso,Usuario autor) {
 		this.titulo = titulo;
 		this.mensagem = mensagem;
 		this.curso = curso;
+		this.autor=autor;
 	}
 
 	@Override
