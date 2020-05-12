@@ -1,0 +1,8 @@
+version: 3
+services:
+  redis:
+    image: redis
+    networks:
+      -forum-network
+  springBootAdmin:
+      image: banditnunes/sping-boot-admin-0.0.1-SNAPSHOT
