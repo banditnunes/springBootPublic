@@ -1,0 +1,31 @@
+version: '3'
+services:
+  redis:
+    image: redis
+    networks:
+      -forum-network
+  springBootAdmin:
+    image: banditnunes/spring-boot-admin:0.0.1-SNAPSHOT
+    container_name: spring_boot_admin
+    ports:
+      - "8083:8083"
+    networks:
+      -forum-network
+    depends_on:
+      - redis
+      - springBootForum
+    springBootForum:
+      build:
+        dockerfile: ./Dockerfile
+        context: .
+        image: banditnunes/forum:0.0.1-SNAPSHOT
+        container_name: spring_boot_forum
+        ports:
+          - "8082:8082"
+        depends_on:
+          - redis
+
+
+networks:
+  forum-network:
+    driver: bridge
