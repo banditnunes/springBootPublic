@@ -1,10 +1,15 @@
 package br.com.alura.curso.springboot.forum.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
-@Entity
-public class Curso {
+@NamedEntityGraph(name = "cursoCategoria", attributeNodes = {
+		@NamedAttributeNode(value = "categoria")
+})
+@Entity(name = "curso")
+public class Curso implements Serializable {
 
+	private static final long serialVersionUID = 8835158890941474111L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

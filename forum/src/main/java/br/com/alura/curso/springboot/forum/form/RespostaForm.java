@@ -29,9 +29,11 @@ public class RespostaForm {
     public Resposta converter(TopicoRepository topicoRepository, TokenService tokenService, String token, UsuarioRepository usuarioRepository) {
         logger.info("Buscando usuario logado");
         Usuario autor = retornaUsuarioLogado(token, tokenService, usuarioRepository);
+        System.out.println( autor.getNome()+" - "+topico);
         logger.debug("Usuario:" + autor.getNome());
         Optional<Topico> topicoOptional = topicoRepository.findByTitulo(topico).stream().findFirst();
         if (topicoOptional.isPresent()) {
+            System.out.println("Tópico " + topico + " retornado");
             logger.debug("Tópico " + topico + " retornado");
             Topico topico = topicoOptional.get();
             return new Resposta(mensagem, topico, autor, false);
@@ -43,7 +45,9 @@ public class RespostaForm {
 
 
     private Usuario retornaUsuarioLogado(String token, TokenService tokenService, UsuarioRepository usuarioRepository) {
+
         Long idUsuario = tokenService.getIdUsuario(token);
         return usuarioRepository.findById(idUsuario).get();
+
     }
 }

@@ -1,16 +1,23 @@
 package br.com.alura.curso.springboot.forum.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Entity
-public class Resposta {
+@NamedEntityGraph(name = "topicoResposta",attributeNodes = {
+		@NamedAttributeNode("topico"),
+		@NamedAttributeNode("autor")
+})
 
-	@Id
+@Entity(name = "resposta")
+public class Resposta implements Serializable {
+
+    private static final long serialVersionUID = 6493779264042885741L;
+    @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String mensagem;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY,targetEntity =Topico.class)
 	private Topico topico;
 	private LocalDateTime dataCriacao = LocalDateTime.now();
 	@ManyToOne

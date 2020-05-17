@@ -1,6 +1,8 @@
 package br.com.alura.curso.springboot.forum.model;
 
-public enum StatusTopico {
+import java.io.Serializable;
+
+public enum StatusTopico implements Serializable {
 	
 	NAO_RESPONDIDO,
 	NAO_SOLUCIONADO,

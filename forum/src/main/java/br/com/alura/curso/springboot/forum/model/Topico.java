@@ -3,11 +3,34 @@ package br.com.alura.curso.springboot.forum.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+@NamedEntityGraph(name = "topicoComRespostas",
+		attributeNodes = {
+				@NamedAttributeNode("titulo"),
+				@NamedAttributeNode(value = "curso",subgraph = "categoria-subgraph"),
+				@NamedAttributeNode(value = "respostas"),
+				@NamedAttributeNode(value = "autor",subgraph = "perfis-subgraph")
+			},
+		subgraphs = {
+				@NamedSubgraph(name = "categoria-subgraph",attributeNodes = {
+						@NamedAttributeNode("categoria")
+				}),
+				@NamedSubgraph(name = "perfis-subgraph", attributeNodes = {
+						@NamedAttributeNode("perfis")
+				})
+		}
+
+)
+@NamedEntityGraph(name = "topicoPorTitulo",attributeNodes = {
+		@NamedAttributeNode(value = "curso")
+})
 
 @Entity(name = "topico")
 public class Topico implements Serializable {
+
+	private static final long serialVersionUID = 8679444543759479482L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -20,8 +43,8 @@ public class Topico implements Serializable {
 	private Usuario autor;
 	@ManyToOne(cascade = CascadeType.REMOVE)
 	private Curso curso;
-	@OneToMany(mappedBy = "topico")
-	private List<Resposta> respostas = new ArrayList<>();
+	@OneToMany(mappedBy = "topico",fetch = FetchType.LAZY)
+	private List<Resposta> respostas ;
 
 	public Topico() {
 	}
@@ -34,28 +57,23 @@ public class Topico implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Topico topico = (Topico) o;
+		return Objects.equals(id, topico.id) &&
+				Objects.equals(titulo, topico.titulo) &&
+				Objects.equals(mensagem, topico.mensagem) &&
+				Objects.equals(dataCriacao, topico.dataCriacao) &&
+				status == topico.status &&
+				Objects.equals(autor, topico.autor) &&
+				Objects.equals(curso, topico.curso) &&
+				Objects.equals(respostas, topico.respostas);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Topico other = (Topico) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
+	public int hashCode() {
+		return Objects.hash(id, titulo, mensagem, dataCriacao, status, autor, curso, respostas);
 	}
 
 	public Long getId() {
@@ -121,5 +139,4 @@ public class Topico implements Serializable {
 	public void setRespostas(List<Resposta> respostas) {
 		this.respostas = respostas;
 	}
-
 }

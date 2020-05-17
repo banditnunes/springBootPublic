@@ -4,9 +4,16 @@ import br.com.alura.curso.springboot.forum.model.Resposta;
 import br.com.alura.curso.springboot.forum.model.Topico;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RespostaRepository extends JpaRepository<Resposta,Long> {
+import java.util.Optional;
 
+public interface RespostaRepository extends JpaRepository<Resposta,Long> {
+    @EntityGraph(value = "topicoResposta",type = EntityGraph.EntityGraphType.LOAD)
     Page<Resposta> findByTopico(Topico topico, Pageable page);
+
+    @Override
+    @EntityGraph(value = "topicoResposta",type = EntityGraph.EntityGraphType.LOAD)
+    Optional<Resposta> findById(Long aLong);
 }

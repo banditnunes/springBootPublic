@@ -8,6 +8,7 @@ import br.com.alura.curso.springboot.forum.repository.RespostaRepository;
 import br.com.alura.curso.springboot.forum.repository.TopicoRepository;
 import br.com.alura.curso.springboot.forum.repository.UsuarioRepository;
 import br.com.alura.curso.springboot.forum.service.TokenService;
+import br.com.alura.curso.springboot.forum.util.CustomResponseEntity;
 import br.com.alura.curso.springboot.forum.util.RecuperaToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,9 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -50,7 +54,7 @@ public class RespostaController  extends  BaseController<Resposta,Long, Resposta
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = CACHE_NOME_RESPOSTA,key = CACHE_KEY_RESPOSTA)
+    @CacheEvict(cacheNames = CACHE_NOME_RESPOSTA,allEntries = true)
     public ResponseEntity<RespostaDTO> cadastrar(@RequestHeader(name = "Authorization") String token, @RequestBody  @Valid RespostaForm respostaForm, UriComponentsBuilder uriComponentsBuilder) {
         try {
             logger.info("Conversão inicializada...");
@@ -65,11 +69,11 @@ public class RespostaController  extends  BaseController<Resposta,Long, Resposta
         }
     }
 
-
     @Override
     @Cacheable(cacheNames = CACHE_NOME_RESPOSTA,key = "#root.method.name")
-    public Page<RespostaDTO> listar(@PathVariable String topico, Pageable page) {
-        Topico topicoRetornado = topicoRetornado(topico);
+    public Page<RespostaDTO> listar(@RequestParam(required = false) String nomeTopico,
+                                    @PageableDefault(page=0,size = 10,direction = Sort.Direction.ASC) Pageable page) {
+        Topico topicoRetornado = topicoRetornado(nomeTopico);
         Page<Resposta> respostasPorTopico = respostaRepository.findByTopico(topicoRetornado, page);
         return  respostasPorTopico.map(RespostaDTO::new);
     }
@@ -78,47 +82,49 @@ public class RespostaController  extends  BaseController<Resposta,Long, Resposta
     @Override
     @Transactional
     @Cacheable(cacheNames = CACHE_NOME_RESPOSTA,key = CACHE_KEY_RESPOSTA)
-    public ResponseEntity<RespostaDTO> detalhar(@PathVariable Long id) {
+    public CustomResponseEntity<RespostaDTO> detalhar(@PathVariable Long id) {
         Optional<Resposta> respostaRetornada = respostaRepository.findById(id);
         if(respostaRetornada.isPresent()){
             logger.debug("Resposta "+ respostaRetornada.get().getMensagem()+" retornada");
-            return ResponseEntity.ok(new RespostaDTO(respostaRetornada.get()));
+            return new CustomResponseEntity(new RespostaDTO(respostaRetornada.get()), HttpStatus.OK);
         }
         logger.error("Resposta com o "+ id+ "não foi encontrado");
-        return ResponseEntity.badRequest().build();
+        return new CustomResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @Override
     @Transactional
     @CachePut(cacheNames = CACHE_NOME_RESPOSTA,key = CACHE_KEY_RESPOSTA)
-    public ResponseEntity<RespostaDTO> atualizar(@PathVariable Long id,@RequestBody RespostaDTO respostaDTO) {
+    public CustomResponseEntity<RespostaDTO> atualizar(@PathVariable Long id,@RequestBody RespostaDTO respostaDTO) {
         try {
             Resposta resposta = respostaDTO.converter(respostaRepository, id, topicoRepository);
             logger.debug("Resposta "+resposta.getMensagem()+" convertida");
-             return ResponseEntity.ok(new RespostaDTO(resposta));
+             return new CustomResponseEntity(new RespostaDTO(resposta),HttpStatus.OK);
         }catch (Exception e) {
             logger.error("Resposta de id "+id+ " não foi atualizada com sucesso");
-            return ResponseEntity.badRequest().build();
+            return new CustomResponseEntity(HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
     @Transactional
     @CacheEvict(cacheNames = CACHE_NOME_RESPOSTA,key = CACHE_KEY_RESPOSTA)
-    public ResponseEntity remover(@PathVariable  Long id) {
+    public CustomResponseEntity remover(@PathVariable  Long id) {
         try {
             respostaRepository.deleteById(id);
             logger.debug("Resposta com id  "+id+ " removida com sucesso");
-           return  ResponseEntity.ok().build();
+           return  new CustomResponseEntity(HttpStatus.OK);
         }catch (Exception e) {
             logger.debug("Resposta com id "+id+" não encontrada");
-            return ResponseEntity.badRequest().build();
+            return new CustomResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 
     private Topico topicoRetornado(String topico) {
+        System.out.println("Buscando Titulo "+topico);
         Optional<Topico> optionalTopico = topicoRepository.findByTitulo(topico).stream().findFirst();
         if(optionalTopico.isPresent()) {
+            System.out.println("Titulo Encontrado");
             logger.debug("Topico  " + topico + " retornado com sucesso");
             return optionalTopico.get();
         }

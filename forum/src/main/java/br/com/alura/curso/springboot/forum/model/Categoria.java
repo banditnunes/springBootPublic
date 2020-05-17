@@ -8,6 +8,8 @@ import java.io.Serializable;
 
 @Entity
 public class Categoria implements Serializable {
+
+    private static final long serialVersionUID = 8971542860583240019L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

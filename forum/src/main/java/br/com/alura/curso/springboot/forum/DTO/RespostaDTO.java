@@ -22,6 +22,7 @@ public class RespostaDTO implements Serializable {
     public RespostaDTO(){}
 
     public RespostaDTO(Resposta respostaSalva) {
+
             this.id = respostaSalva.getId();
             this.mensagem=respostaSalva.getMensagem();
             this.topico=respostaSalva.getTopico().getTitulo();

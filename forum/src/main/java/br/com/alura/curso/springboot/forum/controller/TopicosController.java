@@ -60,9 +60,12 @@ public class TopicosController {
     @GetMapping
     @Cacheable(cacheNames = CACHE_NOME_TOPICO,key = "#root.method.name")
     public Page<TopicoDTO> listarTopicosPorCurso(@RequestParam(required = false) String nomeCurso,
-                                                 @PageableDefault(page=0,size = 10,direction = Sort.Direction.ASC)
+                                                   @PageableDefault(page=0,size = 10,direction = Sort.Direction.ASC)
+
                                                          Pageable page){
+
         if(nomeCurso==null) {
+        System.out.println("Iniciando busca ");
             return TopicoDTO.transformaTopicoDTO(topicoRepository.findAll(page));
         }else {
             return  TopicoDTO.transformaTopicoDTO(topicoRepository.findByCursoNome(nomeCurso,page));

@@ -4,15 +4,17 @@ import br.com.alura.curso.springboot.forum.model.Categoria;
 import br.com.alura.curso.springboot.forum.model.Curso;
 import br.com.alura.curso.springboot.forum.repository.CategoriaRepository;
 import br.com.alura.curso.springboot.forum.repository.CursoRepository;
+import br.com.alura.curso.springboot.forum.util.CustomResponseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
 import java.util.Optional;
 
-public class CursoDTO extends BaseDTO implements Serializable {
+
+public class CursoDTO implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(CursoDTO.class);
 
@@ -55,7 +57,7 @@ public class CursoDTO extends BaseDTO implements Serializable {
         this.categoria = curso.getCategoria().getDescricao();
     }
 
-    public ResponseEntity<CursoDTO> atualizarCurso(CursoRepository cursoRepository, Long id, CategoriaRepository categoriaRepository) {
+    public CustomResponseEntity<CursoDTO> atualizarCurso(CursoRepository cursoRepository, Long id, CategoriaRepository categoriaRepository) {
         Optional<Curso> curso = cursoRepository.findById(id);
         if (curso.isPresent()) {
             logger.debug("Curso" + curso.get().getNome() + " retornado");
@@ -67,9 +69,9 @@ public class CursoDTO extends BaseDTO implements Serializable {
             });
 
             setId(curso.get().getId());
-            return ResponseEntity.ok(this);
+            return new CustomResponseEntity(this, HttpStatus.OK);
         } else {
-            return ResponseEntity.notFound().build();
+            return new CustomResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 
