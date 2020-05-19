@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Autenticao Usuario",
+  "type": "object",
+  "properties": {
+    "tipo": {
+      "description": "Tipo de Autenticacao",
+      "type": "string"
+    },
+    "token":{
+      "description": "Token de autenticacao do usuario",
+      "type": "string"
+    }
+  },
+  "required": ["tipo","token"]
+}
