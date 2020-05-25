@@ -129,45 +129,13 @@
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.jenkins-ci.plugins/slack -->
-
 	</dependencies>
-<pluginRepositories>
-	<pluginRepository>
-		<id>org.jenkins-ci.plugins</id>
-		<url>https://repo.spring.io/plugins-release/</url>
-		<releases>
-			<enabled>true</enabled>
-		</releases>
-		<snapshots>
-			<enabled>false</enabled>
-		</snapshots>
-	</pluginRepository>
-</pluginRepositories>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>pre-integration-test</id>
-						<goals>
-							<goal>start</goal>
-						</goals>
-						<configuration>
-							<arguments>
-								<argument>--server.port=8082</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>post-integration-test</id>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
+
 			</plugin>
 <!--			<plugin>-->
 <!--				<groupId>com.spotify</groupId>-->
